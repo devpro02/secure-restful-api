@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    ports:
+      - "3307:3306"
+    networks:
+      - spring-mysql-net
+    volumes:
+      - mysql-data:/var/lib/mysql
+    container_name: mysql-container
+
+  spring-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql
+    restart: always
+    ports:
+      - "8080:8080"
+    container_name: spring-boot-container
+    networks:
+      - spring-mysql-net
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/secureapi?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=password
+networks:
+  spring-mysql-net:
+volumes:
+  mysql-data:
